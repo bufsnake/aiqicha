@@ -46,10 +46,15 @@ func Core(conf *config.Config) error {
 		}()
 		select {
 		case <-time.After(5 * time.Minute):
+			go func() {
+				<-flag
+			}()
 		case <-flag:
 		}
 	}
 	group.Wait()
+	fmt.Println("数据获取完成，正在保存...")
 	log.SaveData()
+	fmt.Println("数据保存完成")
 	return nil
 }
