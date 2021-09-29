@@ -441,7 +441,7 @@ const shareholders = async () => {
         for (var i = 0; i < tbody.length; i++) {
             var path = tbody[i].querySelectorAll('td');
             console.log("bufsnake shareholders " + path[1].innerText.replaceAll('\n', " ").replaceAll("股权结构",
-                " ").replaceAll(">", " ").trim() + " " + path[2].innerText);
+                " ").replaceAll(">", " ").trim().replaceAll(" ", "-") + " " + path[2].innerText);
         }
         await sleep(2000);
         if (!getNext_shareholders()) {
@@ -515,7 +515,7 @@ const webRecord = async () => {
        var tbody = document.querySelectorAll('#certRecord-webRecord > table > tbody > tr');
        for (var i = 0; i < tbody.length; i++) {
            var path = tbody[i].querySelectorAll('td');
-           console.log("bufsnake webRecord "+path[1].innerText + " " + path[2].innerText + " " + path[4].innerText);
+           console.log("bufsnake webRecord "+path[1].innerText.replaceAll("\n",";") + " " + path[2].innerText.replaceAll("\n",";") + " " + path[4].innerText.replaceAll("\n",";"));
        }
        await sleep(2000);
        if (!getNext_webRecord()) {
