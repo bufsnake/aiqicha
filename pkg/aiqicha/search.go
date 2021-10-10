@@ -163,7 +163,7 @@ var companys = document.querySelectorAll(
     'body > div.base.page-search.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.main > div.list-wrap > div.company-list > div > div'
 );
 for (var i = 0; i < companys.length; i++) {
-    if (companys[i].querySelector('div.info > div > h3 > a').innerText == "` + data + `") {
+    if (companys[i].querySelector('div.info > div > h3 > a').innerText == "` + strings.ReplaceAll(strings.ReplaceAll(data, "）", ")"), "（", "(") + `" || companys[i].querySelector('div.info > div > h3 > a').innerText == "` + data + `") {
         companys[i].querySelector('div.info > div > h3 > a').target = '_self';
         companys[i].querySelector('div.info > div > h3 > a').click();
     }
