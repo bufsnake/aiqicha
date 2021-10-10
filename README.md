@@ -22,6 +22,8 @@ Usage of ./aiqicha:
     	timeout (default 3600)
 ```
 
+📢: 重启机器后的第一次启动都会要求登录账号(启动之后正常的登录账号就行)
+
 📢: 如果迟迟没有结果输出的时候，可以使用 -disable-headless 启动，查看原因
 
 📢: cookie信息存储在 '/tmp/cookies.aiqicha' 内，可以上传到其它平台使用
