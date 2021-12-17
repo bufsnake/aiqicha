@@ -86,10 +86,6 @@ func (a *aiqicha) SwitchTab() {
 			if _, ok := targets_[targets[i].TargetID]; !ok {
 				targets_[targets[i].TargetID] = time.Now()
 			}
-			err = target.ActivateTarget(targets[i].TargetID).Do(cdp.WithExecutor(a.ctx, chromedp.FromContext(a.ctx).Browser))
-			if err != nil {
-				continue
-			}
 			if time.Now().Sub(targets_[targets[i].TargetID]).Seconds() >= float64(a.conf_.Timeout) {
 				_ = target.CloseTarget(targets[i].TargetID).Do(cdp.WithExecutor(a.ctx, chromedp.FromContext(a.ctx).Browser))
 			}

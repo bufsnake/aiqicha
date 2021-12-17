@@ -88,6 +88,7 @@ func tasks(data string) chromedp.Tasks {
 			return nil
 		}),
 		chromedp.WaitVisible("#aqc-search-input"),
+		// 判断是否登录
 		chromedp.ActionFunc(func(ctx context.Context) (err error) {
 			defer func() {
 				if err != nil {
@@ -107,38 +108,33 @@ func tasks(data string) chromedp.Tasks {
 			}
 			return nil
 		}),
+		// 输入公司名，点击查询
 		chromedp.ActionFunc(func(ctx context.Context) (err error) {
 			defer func() {
 				if err != nil {
 					_ = target.CloseTarget(chromedp.FromContext(ctx).Target.TargetID).Do(cdp.WithExecutor(ctx, chromedp.FromContext(ctx).Browser))
 				}
 			}()
-			result, exception, err := runtime.Evaluate(`document.querySelector('body > div.base.page-index.has-search-tab > header > div > div.header-func > div.header-login > div > a').innerText`).Do(ctx)
-			if err != nil {
-				return err
-			}
-			if exception != nil {
-				err = exception
-				return
-			}
-			if !result.Value.IsDefined() {
-				return errors.New("user is undefined ?")
+			return chromedp.SendKeys("#aqc-search-input", data).Do(ctx)
+		}),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			return chromedp.Evaluate(`document.querySelector('body > div.base.page-index.has-search-tab > div.search-panel > div > div.index-search > div.index-search-input > button').click()`, nil).Do(ctx)
+		}),
+		// 等待查询结果
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			fin := make(chan bool)
+			go func() {
+				_ = chromedp.WaitVisible("body > div.base.page-search.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.main > div.list-wrap > div.header > span").Do(ctx)
+				fin <- true
+			}()
+			select {
+			case <-time.After(10 * time.Second):
+				return errors.New("wait body > div.base.page-search.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.main > div.list-wrap > div.header > span error")
+			case <-fin:
+				break
 			}
 			return nil
 		}),
-		chromedp.ActionFunc(func(ctx context.Context) (err error) {
-			defer func() {
-				if err != nil {
-					_ = target.CloseTarget(chromedp.FromContext(ctx).Target.TargetID).Do(cdp.WithExecutor(ctx, chromedp.FromContext(ctx).Browser))
-				}
-			}()
-			err = chromedp.SendKeys("#aqc-search-input", data).Do(ctx)
-			if err != nil {
-				return err
-			}
-			return chromedp.Click("body > div.base.page-index.has-search-tab > div.search-panel > div > div.index-search > div.index-search-input > button").Do(ctx)
-		}),
-		chromedp.WaitVisible("body > div.base.page-search.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.main > div.list-wrap > div.header > span"),
 		chromedp.Sleep(1 * time.Second),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			// 判断是否为 0 家
@@ -173,14 +169,52 @@ for (var i = 0; i < companys.length; i++) {
 				return err
 			}
 			if exception != nil {
-				err = exception
-				return
+				return exception
 			}
 			return
 		}),
-		chromedp.WaitVisible("body > div.base.page-detail.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.detail-header-container > div.detail-header > div.header-top > div.header-content > div.business-info > div.registered-capital.ellipsis-line-1 > span"),
-		chromedp.WaitVisible("#basic-stockchart > h3 > span"),
-		chromedp.WaitVisible("#basic-doubtcontroller > h3 > span"),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			fin := make(chan bool)
+			go func() {
+				_ = chromedp.WaitVisible("body > div.base.page-detail.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.detail-header-container > div.detail-header > div.header-top > div.header-content > div.business-info > div.registered-capital.ellipsis-line-1 > span").Do(ctx)
+				fin <- true
+			}()
+			select {
+			case <-time.After(10 * time.Second):
+				return errors.New("wait body > div.base.page-detail.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.detail-header-container > div.detail-header > div.header-top > div.header-content > div.business-info > div.registered-capital.ellipsis-line-1 > span error")
+			case <-fin:
+				break
+			}
+			return nil
+		}),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			fin := make(chan bool)
+			go func() {
+				_ = chromedp.WaitVisible("#basic-stockchart > h3 > span").Do(ctx)
+				fin <- true
+			}()
+			select {
+			case <-time.After(10 * time.Second):
+				return errors.New("wait #basic-stockchart > h3 > span error")
+			case <-fin:
+				break
+			}
+			return nil
+		}),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			fin := make(chan bool)
+			go func() {
+				_ = chromedp.WaitVisible("#basic-doubtcontroller > h3 > span").Do(ctx)
+				fin <- true
+			}()
+			select {
+			case <-time.After(10 * time.Second):
+				return errors.New("wait #basic-doubtcontroller > h3 > span error")
+			case <-fin:
+				break
+			}
+			return nil
+		}),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			_, exception, err := runtime.Evaluate(`
 const sleep = async (ms) => {
