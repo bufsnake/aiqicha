@@ -254,12 +254,12 @@ const sleep = async (ms) => {
 					}
 				}
 				function getNext_Control() {
-				   var tbody = document.querySelectorAll('#basic-hold > div > ul > li');
+				   var tbody = document.querySelectorAll('#basic-hold > div > div > ul > li');
 				   if (tbody.length == 0) {
 				       return false
 				   }
 				   if (tbody[tbody.length - 1].className.indexOf('disabled') == -1) {
-				       document.querySelector('#basic-hold > div > ul > li.ivu-page-next > a').click();
+				       document.querySelector('#basic-hold > div > div > ul > li.ivu-page-next > a').click();
 				       return true
 				   }
 				   return false
@@ -290,11 +290,12 @@ const sleep = async (ms) => {
 				               console.log("bufsnake control " + value.trim());
 				           }
 				       }
-				       await sleep(2000);
 				       if (!getNext_Control()) {
 				           break
 				       }
+				       await sleep(2000);
 				   }
+				   await sleep(2000);
 				}
 				control()
 				`
@@ -315,10 +316,13 @@ const sleep = async (ms) => {
 			}
 			// 存在: HTMLHeadingElement
 			if result.ClassName == "HTMLLIElement" {
-				return chromedp.WaitVisible("#basic-hold > div > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
+				// 下一页为display: none导致WaitVisible不可用
+				// REF: https://github.com/chromedp/chromedp/issues/262
+				return chromedp.WaitReady("#basic-hold > div > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
 			}
 			return
 		}),
+		chromedp.Sleep(2 * time.Second),
 		// 对外投资
 		chromedp.ActionFunc(func(ctx context.Context) (err error) {
 			defer func() {
@@ -346,12 +350,12 @@ const sleep = async (ms) => {
 		}
 		
 		function getNext_invest() {
-		  var tbody = document.querySelectorAll('#basic-invest > div > ul > li');
+		  var tbody = document.querySelectorAll('#basic-invest > div > div > ul > li');
 		  if (tbody.length == 0) {
 		      return false
 		  }
 		  if (tbody[tbody.length - 1].className.indexOf('disabled') == -1) {
-		      document.querySelector('#basic-invest > div > ul > li.ivu-page-next > a').click();
+		      document.querySelector('#basic-invest > div > div > ul > li.ivu-page-next > a').click();
 		      return true
 		  }
 		  return false
@@ -365,11 +369,13 @@ const sleep = async (ms) => {
 		          console.log("bufsnake invest "+path[1].querySelector('div > div.title.portrait-text > a.ellipsis-line-2').innerText +
 		              " " + path[4].innerText + " " + path[6].innerText);
 		      }
-		      await sleep(2000);
 		      if (!getNext_invest()) {
+                  console.log("对外投资获取完成")
 		          break
 		      }
+		      await sleep(2000);
 		  }
+		  await sleep(2000);
 		}
 		invest()
 		`
@@ -390,10 +396,11 @@ const sleep = async (ms) => {
 			}
 			// 存在: HTMLHeadingElement
 			if result.ClassName == "HTMLDivElement" {
-				return chromedp.WaitVisible("#basic-invest > div.aqc-table-list-pager > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
+				return chromedp.WaitReady("#basic-invest > div.aqc-table-list-pager > div > ul > li.ivu-page-next.ivu-page-disabled").Do(ctx)
 			}
 			return
 		}),
+		chromedp.Sleep(2 * time.Second),
 		//工商注册
 		chromedp.ActionFunc(func(ctx context.Context) (err error) {
 			defer func() {
@@ -431,6 +438,7 @@ console.log("bufsnake business "+JSON.stringify(output))
 			}
 			return err
 		}),
+		chromedp.Sleep(2 * time.Second),
 		// 股东信息
 		chromedp.ActionFunc(func(ctx context.Context) (err error) {
 			defer func() {
@@ -458,12 +466,12 @@ if (typeof eval('sleep') !== "function") {
 }
 
 function getNext_shareholders() {
-    var tbody = document.querySelectorAll('#basic-shareholders > div > ul > li');
+    var tbody = document.querySelectorAll('#basic-shareholders > div > div > ul > li');
     if (tbody.length == 0) {
         return false
     }
     if (tbody[tbody.length - 1].className.indexOf('disabled') == -1) {
-        document.querySelector('#basic-shareholders > div > ul > li.ivu-page-next > a').click();
+        document.querySelector('#basic-shareholders > div > div > ul > li.ivu-page-next > a').click();
         return true
     }
     return false
@@ -477,11 +485,12 @@ const shareholders = async () => {
             console.log("bufsnake shareholders " + path[1].innerText.replaceAll('\n', " ").replaceAll("股权结构",
                 " ").replaceAll(">", " ").trim().replaceAll(" ", "-") + " " + path[2].innerText);
         }
-        await sleep(2000);
         if (!getNext_shareholders()) {
             break
         }
+        await sleep(2000);
     }
+	await sleep(2000);
 }
 shareholders()`
 			_, exception, err = runtime.Evaluate(auto).Do(ctx)
@@ -501,10 +510,11 @@ shareholders()`
 			}
 			// 存在: HTMLHeadingElement
 			if result.ClassName == "HTMLDivElement" {
-				return chromedp.WaitVisible("#basic-shareholders > div.aqc-table-list-pager > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
+				return chromedp.WaitReady("#basic-shareholders > div.aqc-table-list-pager > div > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
 			}
 			return
 		}),
+		chromedp.Sleep(2 * time.Second),
 		chromedp.Click("body > div.base.page-detail.has-search-tab > div.aqc-content-wrapper.has-footer > div > div.tab-wrapper > div > div > div:nth-child(3) > a"),
 		chromedp.Sleep(2 * time.Second),
 		// 网站备案
@@ -533,12 +543,12 @@ if (typeof eval('sleep') !== "function") {
 }
 
 function getNext_webRecord() {
-   var tbody = document.querySelectorAll('#certRecord-webRecord > div > ul > li');
+   var tbody = document.querySelectorAll('#certRecord-webRecord > div > div > ul > li');
    if (tbody.length == 0) {
 	   return false
    }
    if (tbody[tbody.length - 1].className.indexOf('disabled') == -1) {
-       document.querySelector('#certRecord-webRecord > div > ul > li.ivu-page-next > a').click();
+       document.querySelector('#certRecord-webRecord > div > div > ul > li.ivu-page-next > a').click();
        return true
    }
    return false
@@ -551,11 +561,12 @@ const webRecord = async () => {
            var path = tbody[i].querySelectorAll('td');
            console.log("bufsnake webRecord "+path[1].innerText.replaceAll("\n",";") + " " + path[2].innerText.replaceAll("\n",";") + " " + path[4].innerText.replaceAll("\n",";"));
        }
-       await sleep(2000);
        if (!getNext_webRecord()) {
            break
        }
+       await sleep(2000);
    }
+   await sleep(2000);
 }
 webRecord()`
 			_, exception, err = runtime.Evaluate(auto).Do(ctx)
@@ -575,10 +586,11 @@ webRecord()`
 			}
 			// 存在: HTMLHeadingElement
 			if result.ClassName == "HTMLDivElement" {
-				return chromedp.WaitVisible("#certRecord-webRecord > div.aqc-table-list-pager > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
+				return chromedp.WaitReady("#certRecord-webRecord > div.aqc-table-list-pager > div > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
 			}
 			return
 		}),
+		chromedp.Sleep(2 * time.Second),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			return target.CloseTarget(chromedp.FromContext(ctx).Target.TargetID).Do(cdp.WithExecutor(ctx, chromedp.FromContext(ctx).Browser))
 		}),

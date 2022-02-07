@@ -222,7 +222,7 @@ func Shareholders(name, data string) {
 	data = strings.ReplaceAll(data, "bufsnake shareholders ", "")
 	split := strings.Split(data, " ")
 	if len(split) == 2 {
-		fmt.Println(name, "股东", split[0], split[1])
+		fmt.Println(name, "股东", split[0], strings.TrimRight(split[1], " \r\n\t持股详情>"))
 		shareholders = append(shareholders, shareholders_struct{
 			currEnt: name,
 			entName: split[0],
