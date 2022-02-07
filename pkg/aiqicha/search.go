@@ -295,7 +295,6 @@ const sleep = async (ms) => {
 				       }
 				       await sleep(2000);
 				   }
-				   await sleep(2000);
 				}
 				control()
 				`
@@ -307,7 +306,7 @@ const sleep = async (ms) => {
 				return err
 			}
 			// 存在多页则等待
-			result, exception, err = runtime.Evaluate(`document.querySelector('#basic-hold > div > ul > li')`).Do(ctx)
+			result, exception, err = runtime.Evaluate(`document.querySelector('#basic-hold > div > div > ul > li')`).Do(ctx)
 			if exception != nil {
 				err = exception
 			}
@@ -318,7 +317,7 @@ const sleep = async (ms) => {
 			if result.ClassName == "HTMLLIElement" {
 				// 下一页为display: none导致WaitVisible不可用
 				// REF: https://github.com/chromedp/chromedp/issues/262
-				return chromedp.WaitReady("#basic-hold > div > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
+				return chromedp.WaitNotVisible("#basic-hold > div > div > ul > li.ivu-page-next").Do(ctx)
 			}
 			return
 		}),
@@ -375,7 +374,6 @@ const sleep = async (ms) => {
 		      }
 		      await sleep(2000);
 		  }
-		  await sleep(2000);
 		}
 		invest()
 		`
@@ -396,7 +394,7 @@ const sleep = async (ms) => {
 			}
 			// 存在: HTMLHeadingElement
 			if result.ClassName == "HTMLDivElement" {
-				return chromedp.WaitReady("#basic-invest > div.aqc-table-list-pager > div > ul > li.ivu-page-next.ivu-page-disabled").Do(ctx)
+				return chromedp.WaitNotVisible("#basic-invest > div.aqc-table-list-pager > div > ul > li.ivu-page-next").Do(ctx)
 			}
 			return
 		}),
@@ -490,7 +488,6 @@ const shareholders = async () => {
         }
         await sleep(2000);
     }
-	await sleep(2000);
 }
 shareholders()`
 			_, exception, err = runtime.Evaluate(auto).Do(ctx)
@@ -501,7 +498,7 @@ shareholders()`
 				return err
 			}
 			// 存在多页则等待
-			result, exception, err = runtime.Evaluate(`document.querySelector('#basic-shareholders > div.aqc-table-list-pager')`).Do(ctx)
+			result, exception, err = runtime.Evaluate(`document.querySelector('#basic-shareholders > div.aqc-table-list-pager > div > ul')`).Do(ctx)
 			if exception != nil {
 				err = exception
 			}
@@ -510,7 +507,7 @@ shareholders()`
 			}
 			// 存在: HTMLHeadingElement
 			if result.ClassName == "HTMLDivElement" {
-				return chromedp.WaitReady("#basic-shareholders > div.aqc-table-list-pager > div > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
+				return chromedp.WaitNotVisible("#basic-shareholders > div.aqc-table-list-pager > div > ul > li.ivu-page-next").Do(ctx)
 			}
 			return
 		}),
@@ -566,7 +563,6 @@ const webRecord = async () => {
        }
        await sleep(2000);
    }
-   await sleep(2000);
 }
 webRecord()`
 			_, exception, err = runtime.Evaluate(auto).Do(ctx)
@@ -577,7 +573,7 @@ webRecord()`
 				return err
 			}
 			// 存在多页则等待
-			result, exception, err = runtime.Evaluate(`document.querySelector('#certRecord-webRecord > div.aqc-table-list-pager')`).Do(ctx)
+			result, exception, err = runtime.Evaluate(`document.querySelector('#certRecord-webRecord > div > div > ul')`).Do(ctx)
 			if exception != nil {
 				err = exception
 			}
@@ -586,11 +582,11 @@ webRecord()`
 			}
 			// 存在: HTMLHeadingElement
 			if result.ClassName == "HTMLDivElement" {
-				return chromedp.WaitReady("#certRecord-webRecord > div.aqc-table-list-pager > div > ul > li.ivu-page-next.ivu-page-disabled > a > i").Do(ctx)
+				return chromedp.WaitNotVisible("#certRecord-webRecord > div > div > ul > li.ivu-page-next").Do(ctx)
 			}
 			return
 		}),
-		chromedp.Sleep(2 * time.Second),
+		chromedp.Sleep(10 * time.Second),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			return target.CloseTarget(chromedp.FromContext(ctx).Target.TargetID).Do(cdp.WithExecutor(ctx, chromedp.FromContext(ctx).Browser))
 		}),
